@@ -10,9 +10,12 @@ namespace Fuse.Entities
 {
 	public block DefaultShading
 	{
-		public DrawContext DrawContext: null;
+		public DrawContext DrawContext: 
+			tag("Null") null;
 
-		public IRenderViewport RenderViewport: DrawContext != null ? DrawContext.Viewport : null;
+		public IRenderViewport RenderViewport:
+			tag("Null") req(DrawContext tag "Null") null,
+			DrawContext != null ? DrawContext.Viewport : null;
 
 		public texture2D NormalMap: prev;
 		public texture2D DiffuseMap: prev;
@@ -37,16 +40,23 @@ namespace Fuse.Entities
 
 		public double Time: Fuse.Time.FrameTime;
 
-		public float3 CameraPosition: RenderViewport != null ? RenderViewport.ViewOrigin : float3(100,100,100);
-		public float2 CameraDepthRange : RenderViewport != null ? RenderViewport.ViewRange : float2(1, 1000);
+		public float3 CameraPosition: 
+			req(RenderViewport tag "Null") float3(100, 100, 100),
+			RenderViewport != null ? RenderViewport.ViewOrigin : float3(100, 100, 100);
+		public float2 CameraDepthRange:
+			req(RenderViewport tag "Null") float2(1, 1000),
+			RenderViewport != null ? RenderViewport.ViewRange : float2(1, 1000);
 
 		public float4x4 View:
+			req(RenderViewport tag "Null") float4x4.Identity,
 			RenderViewport != null ? RenderViewport.ViewTransform : float4x4.Identity;
 
 		public float4x4 Projection:
+			req(RenderViewport tag "Null") float4x4.Identity,
 			RenderViewport != null ? RenderViewport.ProjectionTransform : float4x4.Identity;
 
 		public float4x4 ViewProjection:
+			req(RenderViewport tag "Null") Mul(View, Projection),
 			RenderViewport != null ? RenderViewport.ViewProjectionTransform : Mul(View, Projection);
 
 		public float3x3 View3x3: float3x3(View[0].XYZ, View[1].XYZ, View[2].XYZ);
