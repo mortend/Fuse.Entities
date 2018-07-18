@@ -94,7 +94,8 @@ namespace Fuse.Entities
 				var meshCounts = new Dictionary<Mesh, List<Entry>>();
 				for (int i = 0; i < entries.Count; i++)
 				{
-					if (!meshCounts.ContainsKey(entries[i].Mesh)) meshCounts.Add(entries[i].Mesh, new List<Entry>());
+					if (!meshCounts.ContainsKey(entries[i].Mesh))
+						meshCounts.Add(entries[i].Mesh, new List<Entry>());
 
 					meshCounts[entries[i].Mesh].Add(entries[i]);
 				}
@@ -122,7 +123,9 @@ namespace Fuse.Entities
 
 		int MeshVertexCount(Mesh mesh)
 		{
-			return (mesh.ModelMesh.IndexCount != -1 ? mesh.ModelMesh.IndexCount : mesh.ModelMesh.VertexCount);
+			return mesh.ModelMesh.IndexCount != -1
+				? mesh.ModelMesh.IndexCount
+				: mesh.ModelMesh.VertexCount;
 		}
 
 		MeshBatcher FindOrCreateBatcher(Mesh mesh)
@@ -133,9 +136,9 @@ namespace Fuse.Entities
 				batcher = new MeshBatcher();
 				batchers[mesh] = batcher;
 
-
 				int instanceCount = (int)Math.Min(maxInstancesPerBatch, 65535 / Math.Max(1, MeshVertexCount(mesh)));
-				for (int i = 0; i < instanceCount; i++) batcher.AddMesh(mesh.ModelMesh);
+				for (int i = 0; i < instanceCount; i++)
+					batcher.AddMesh(mesh.ModelMesh);
 
 				batcher.Flush();
 			}
@@ -212,28 +215,28 @@ namespace Fuse.Entities
 						draw this,
 							batch,
 							virtual material,
-							{
-								float4x4 World:
-									req(InstanceIndex as float)
-									req(fixedWorldArray as fixed float4x4[])
-									fixedWorldArray[(int)InstanceIndex];
+						{
+							float4x4 World:
+								req(InstanceIndex as float)
+								req(fixedWorldArray as fixed float4x4[])
+								fixedWorldArray[(int)InstanceIndex];
 
-								int iInstanceIndex : req (InstanceIndex as float)
-									(int)InstanceIndex;
+							int iInstanceIndex : req (InstanceIndex as float)
+								(int)InstanceIndex;
 
-								float4x4 WorldInverse :
-									req(iInstanceIndex as int)
-									req(fixedNormalArray as fixed float4x4[])
-									fixedNormalArray[iInstanceIndex];
+							float4x4 WorldInverse :
+								req(iInstanceIndex as int)
+								req(fixedNormalArray as fixed float4x4[])
+								fixedNormalArray[iInstanceIndex];
 
-								float3x3 WorldInverse3x3:
-									float3x3(WorldInverse[0].XYZ, WorldInverse[1].XYZ, WorldInverse[2].XYZ);
+							float3x3 WorldInverse3x3:
+								float3x3(WorldInverse[0].XYZ, WorldInverse[1].XYZ, WorldInverse[2].XYZ);
 
+							float3x3 WorldRotation: req (WorldInverse3x3 as float3x3)
+								Matrix.Transpose(WorldInverse3x3);
 
-								float3x3 WorldRotation: req (WorldInverse3x3 as float3x3)
-									Matrix.Transpose(WorldInverse3x3);
-								VertexCount: vc;
-							};
+							VertexCount: vc;
+						};
 					}
 					bc = 0;
 					for (int k = 0; k < maxInstancesPerBatch; k++)
@@ -263,11 +266,11 @@ namespace Fuse.Entities
 			draw this,
 				batch,
 				virtual material,
-				{
-					DrawContext DrawContext: dc;
-					float4x4 World: world;
-					float4x4 WorldInverse: worldInverse;
-				};
+			{
+				DrawContext DrawContext: dc;
+				float4x4 World: world;
+				float4x4 WorldInverse: worldInverse;
+			};
 		}
 	}
 }
