@@ -29,23 +29,39 @@ namespace Fuse.Drawing.Batching
 			this.usage = staticBatch ? BufferUsage.Immutable : BufferUsage.Dynamic;
 		}
 
+		public BatchIndexBuffer(IndexType type, byte[] data)
+		{
+			this.DataType = type;
+			this.usage = BufferUsage.Immutable;
+			this.buf = new byte[data.Length];
+			for (int i =0; i<buf.Length; i++)
+				this.buf[i] = data[i];
+		}
+
+		[Obsolete]
 		public BatchIndexBuffer(IndexType type, Buffer data)
 		{
 			this.DataType = type;
 			this.usage = BufferUsage.Immutable;
-			this.buf = new Uno.Buffer(data.SizeInBytes);
-			for (int i =0; i<buf.SizeInBytes; i++)
+			this.buf = new byte[data.SizeInBytes];
+			for (int i =0; i<buf.Length; i++)
 				this.buf[i] = data[i];
 		}
 
-		Buffer buf;
-		public Buffer Buffer
+		byte[] buf;
+		public byte[] Bytes
 		{
 			get
 			{
-				if (buf == null) buf = new Buffer(maxIndices * StrideInBytes);
+				if (buf == null) buf = new byte[maxIndices * StrideInBytes];
 				return buf;
 			}
+		}
+
+		[Obsolete("Use Bytes instead")]
+		public Buffer Buffer
+		{
+			get { return new Buffer(Bytes); }
 		}
 
 		int _position;
@@ -57,13 +73,13 @@ namespace Fuse.Drawing.Batching
 
 		public void Write(byte value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 1;
 		}
 
 		public void Write(ushort value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 2;
 		}
 
@@ -74,10 +90,6 @@ namespace Fuse.Drawing.Batching
 			{
 				if (buf == null)
 					return null;
-
-				if (ibo == null)
-					this.ibo = new IndexBuffer(Buffer.SizeInBytes, usage);
-
 				Flush();
 				return ibo;
 			}
@@ -88,7 +100,11 @@ namespace Fuse.Drawing.Batching
 		{
 			if (buf != null && isDirty)
 			{
-				ibo.Update(buf.GetBytes());
+				if (ibo == null)
+					ibo = new IndexBuffer(buf.Length, usage);
+				else
+					ibo.Update(buf);
+
 				isDirty = false;
 			}
 		}

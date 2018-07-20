@@ -28,25 +28,42 @@ namespace Fuse.Drawing.Batching
 			this.usage = staticBatch ? BufferUsage.Immutable : BufferUsage.Dynamic;
 		}
 
+		public BatchVertexBuffer(VertexAttributeType type, byte[] data)
+		{
+			this.DataType = type;
+			this.usage = BufferUsage.Immutable;
+
+			this.buf = new byte[data.Length];
+			for (int i =0; i<buf.Length; i++)
+				this.buf[i] = data[i];
+		}
+
+		[Obsolete]
 		public BatchVertexBuffer(VertexAttributeType type, Buffer data)
 		{
 			this.DataType = type;
 			this.usage = BufferUsage.Immutable;
 
-			this.buf = new Uno.Buffer(data.SizeInBytes);
-			for (int i =0; i<buf.SizeInBytes; i++)
+			this.buf = new byte[data.SizeInBytes];
+			for (int i =0; i<buf.Length; i++)
 				this.buf[i] = data[i];
 		}
 
 
-		Buffer buf;
-		public Buffer Buffer
+		byte[] buf;
+		public byte[] Bytes
 		{
 			get
 			{
-				if (buf == null) buf = new Buffer(maxVertices * StrideInBytes);
+				if (buf == null) buf = new byte[maxVertices * StrideInBytes];
 				return buf;
 			}
+		}
+
+		[Obsolete("Use Bytes instead")]
+		public Buffer Buffer
+		{
+			get { return new Buffer(Bytes); }
 		}
 
 		VertexBuffer vbo;
@@ -54,7 +71,7 @@ namespace Fuse.Drawing.Batching
 		{
 			get
 			{
-				if (Buffer == null)
+				if (buf == null)
 					return null;
 				Flush();
 				return vbo;
@@ -70,121 +87,121 @@ namespace Fuse.Drawing.Batching
 
 		public void Write(float2 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 8;
 		}
 
 		public void Write(float3 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 12;
 		}
 
 		public void Write(float4 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 16;
 		}
 
 		public void Write(byte value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 1;
 		}
 
 		public void Write(byte2 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 2;
 		}
 
 		public void Write(byte4 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 4;
 		}
 
 		public void Write(sbyte value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 1;
 		}
 
 		public void Write(sbyte2 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 2;
 		}
 
 		public void Write(sbyte4 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 4;
 		}
 
 		public void Write(ushort value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 2;
 		}
 
 		public void Write(ushort2 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 4;
 		}
 
 		public void Write(ushort4 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 8;
 		}
 
 		public void Write(short value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 2;
 		}
 
 		public void Write(short2 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 4;
 		}
 
 		public void Write(short4 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 8;
 		}
 
 		public void Write(uint value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 4;
 		}
 
 		public void Write(int value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 4;
 		}
 
 		public void Write(int2 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 8;
 		}
 
 		public void Write(int3 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 12;
 		}
 
 		public void Write(int4 value)
 		{
-			Buffer.Set(_position, value);
+			Bytes.Set(_position, value);
 			_position += 16;
 		}
 
@@ -194,9 +211,10 @@ namespace Fuse.Drawing.Batching
 			if (buf != null && isDirty)
 			{
 				if (vbo == null)
-					this.vbo = new VertexBuffer(Buffer.SizeInBytes, usage);
-
-				vbo.Update(buf.GetBytes());
+					this.vbo = new VertexBuffer(buf, usage);
+				else
+					vbo.Update(buf);
+				
 				isDirty = false;
 			}
 		}

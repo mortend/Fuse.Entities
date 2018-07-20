@@ -52,24 +52,24 @@ namespace Fuse.Drawing.Batching
 			switch (array.Type)
 			{
 				case VertexAttributeType.Float:
-					return new BatchVertexBuffer(array.Type, array.Buffer);
+					return new BatchVertexBuffer(array.Type, array.Bytes);
 
 				case VertexAttributeType.Float2:
-					return new BatchVertexBuffer(array.Type, array.Buffer);
+					return new BatchVertexBuffer(array.Type, array.Bytes);
 
 				case VertexAttributeType.Float3:
-					return new BatchVertexBuffer(array.Type, array.Buffer);
+					return new BatchVertexBuffer(array.Type, array.Bytes);
 
 				case VertexAttributeType.Float4:
-					return new BatchVertexBuffer(array.Type, array.Buffer);
+					return new BatchVertexBuffer(array.Type, array.Bytes);
 
 				case VertexAttributeType.SByte4:
 				case VertexAttributeType.SByte4Normalized:
-					return new BatchVertexBuffer(array.Type, array.Buffer);
+					return new BatchVertexBuffer(array.Type, array.Bytes);
 
 				case VertexAttributeType.Byte4:
 				case VertexAttributeType.Byte4Normalized:
-					return new BatchVertexBuffer(array.Type, array.Buffer);
+					return new BatchVertexBuffer(array.Type, array.Bytes);
 
 				default:
 					throw new Exception("Unsupported vertex attribute type");
@@ -81,13 +81,13 @@ namespace Fuse.Drawing.Batching
 			switch (array.Type)
 			{
 				case IndexType.Byte:
-					return new BatchIndexBuffer(array.Type, array.Buffer);
+					return new BatchIndexBuffer(array.Type, array.Bytes);
 
 				case IndexType.UShort:
-					return new BatchIndexBuffer(array.Type, array.Buffer);
+					return new BatchIndexBuffer(array.Type, array.Bytes);
 
 				case IndexType.UInt:
-					return new BatchIndexBuffer(array.Type, array.Buffer);
+					return new BatchIndexBuffer(array.Type, array.Bytes);
 
 				default:
 					throw new Exception("Unsupported index type");

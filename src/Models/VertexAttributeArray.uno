@@ -6,7 +6,7 @@ namespace Fuse.Content.Models
 {
     public sealed class VertexAttributeArray
     {
-        readonly Buffer _buffer;
+        readonly byte[] _buffer;
         readonly VertexAttributeType _type;
 
         public VertexAttributeType Type
@@ -14,19 +14,31 @@ namespace Fuse.Content.Models
             get { return _type; }
         }
 
-        public Buffer Buffer
+        public byte[] Bytes
         {
             get { return _buffer; }
         }
 
-        public int Count
+        public Buffer Buffer
         {
-            get { return _buffer.SizeInBytes / VertexAttributeTypeHelpers.GetStrideInBytes(_type); }
+            get { return new Buffer(_buffer); }
         }
 
-        public VertexAttributeArray(VertexAttributeType type, Buffer buffer)
+        public int Count
+        {
+            get { return _buffer.Length / VertexAttributeTypeHelpers.GetStrideInBytes(_type); }
+        }
+
+        public VertexAttributeArray(VertexAttributeType type, byte[] buffer)
         {
             _buffer = buffer;
+            _type = type;
+        }
+
+        [Obsolete("Use the byte[] overload instead")]
+        public VertexAttributeArray(VertexAttributeType type, Buffer buffer)
+        {
+            _buffer = buffer.GetBytes();
             _type = type;
         }
 

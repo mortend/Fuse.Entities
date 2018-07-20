@@ -7,7 +7,7 @@ namespace Fuse.Content.Models
 {
     public sealed class IndexArray
     {
-        readonly Buffer _buffer;
+        readonly byte[] _buffer;
         readonly IndexType _type;
 
         public IndexType Type
@@ -15,24 +15,37 @@ namespace Fuse.Content.Models
             get { return _type; }
         }
 
-        public Buffer Buffer
+        public byte[] Bytes
         {
             get { return _buffer; }
         }
 
-        public int Count
+        [Obsolete("Use Bytes instead")]
+        public Buffer Buffer
         {
-            get { return _buffer.SizeInBytes / IndexTypeHelpers.GetStrideInBytes(_type); }
+            get { return new Buffer(_buffer); }
         }
 
-        public IndexArray(IndexType type, Buffer buffer)
+        public int Count
+        {
+            get { return _buffer.Length / IndexTypeHelpers.GetStrideInBytes(_type); }
+        }
+
+        public IndexArray(IndexType type, byte[] buffer)
         {
             _buffer = buffer;
             _type = type;
         }
 
+        [Obsolete("Use the byte[] overload instead")]
+        public IndexArray(IndexType type, Buffer buffer)
+        {
+            _buffer = buffer.GetBytes();
+            _type = type;
+        }
+
         public IndexArray(byte[] data)
-            : this(IndexType.Byte, BufferConverters.ToBuffer(data))
+            : this(IndexType.Byte, data)
         {
         }
 
@@ -63,6 +76,13 @@ namespace Fuse.Content.Models
                     // TODO: Error
                     return 0;
             }
+        }
+
+        static byte[] ToBytes(ushort[] data)
+        {
+            var result = new byte[data.Length * sizeof(ushort)];
+            // ...
+            return result;
         }
     }
 }
